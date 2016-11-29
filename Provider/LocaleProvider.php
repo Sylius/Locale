@@ -12,7 +12,6 @@
 namespace Sylius\Component\Locale\Provider;
 
 use Sylius\Component\Locale\Model\LocaleInterface;
-use Sylius\Component\Resource\Provider\LocaleProviderInterface;
 use Sylius\Component\Resource\Repository\RepositoryInterface;
 
 /**
@@ -20,7 +19,7 @@ use Sylius\Component\Resource\Repository\RepositoryInterface;
  * @author Gonzalo Vilaseca <gvilaseca@reiss.co.uk>
  * @author Kamil Kokot <kamil.kokot@lakion.com>
  */
-final class LocaleProvider implements AvailableLocalesProviderInterface
+final class LocaleProvider implements LocaleProviderInterface
 {
     /**
      * @var RepositoryInterface
@@ -48,19 +47,6 @@ final class LocaleProvider implements AvailableLocalesProviderInterface
     public function getAvailableLocalesCodes()
     {
         $locales = $this->localeRepository->findBy(['enabled' => true]);
-
-        return array_map(
-            function (LocaleInterface $locale) { return $locale->getCode(); },
-            $locales
-        );
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getDefinedLocalesCodes()
-    {
-        $locales = $this->localeRepository->findAll();
 
         return array_map(
             function (LocaleInterface $locale) { return $locale->getCode(); },

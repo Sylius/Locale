@@ -11,15 +11,18 @@
 
 namespace Sylius\Component\Locale\Provider;
 
-use Sylius\Component\Resource\Provider\LocaleProviderInterface;
-
 /**
- * @author Anna Walasek <anna.walasek@lakion.com>
+ * @author Paweł Jędrzejewski <pawel@sylius.org>
  */
-interface AvailableLocalesProviderInterface extends LocaleProviderInterface
+interface LocaleProviderInterface
 {
     /**
      * @return string[]
      */
     public function getAvailableLocalesCodes();
+
+    /**
+     * @return string
+     */
+    public function getDefaultLocaleCode();
 }
