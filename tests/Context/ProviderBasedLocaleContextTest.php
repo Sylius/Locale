@@ -22,7 +22,7 @@ use Sylius\Component\Locale\Provider\LocaleProviderInterface;
 
 final class ProviderBasedLocaleContextTest extends TestCase
 {
-    /** @var LocaleProviderInterface|MockObject */
+    /** @var LocaleProviderInterface&MockObject */
     private MockObject $localeProviderMock;
 
     private ProviderBasedLocaleContext $providerBasedLocaleContext;

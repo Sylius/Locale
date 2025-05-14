@@ -22,7 +22,7 @@ use Sylius\Component\Locale\Provider\LocaleProviderInterface;
 
 final class LocaleProviderTest extends TestCase
 {
-    /** @var LocaleCollectionProviderInterface|MockObject */
+    /** @var LocaleCollectionProviderInterface&MockObject */
     private MockObject $localeCollectionProviderMock;
 
     private LocaleProvider $localeProvider;
@@ -40,7 +40,7 @@ final class LocaleProviderTest extends TestCase
 
     public function testReturnsAllEnabledLocales(): void
     {
-        /** @var LocaleInterface|MockObject $localeMock */
+        /** @var LocaleInterface&MockObject $localeMock */
         $localeMock = $this->createMock(LocaleInterface::class);
         $this->localeCollectionProviderMock->expects($this->once())->method('getAll')->willReturn([$localeMock]);
         $localeMock->expects($this->once())->method('getCode')->willReturn('en_US');

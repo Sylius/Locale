@@ -22,10 +22,10 @@ use Symfony\Contracts\Cache\CacheInterface;
 
 final class CachedLocaleCollectionProviderTest extends TestCase
 {
-    /** @var LocaleCollectionProviderInterface|MockObject */
+    /** @var LocaleCollectionProviderInterface&MockObject */
     private MockObject $decoratedMock;
 
-    /** @var CacheInterface|MockObject */
+    /** @var CacheInterface&MockObject */
     private MockObject $cacheMock;
 
     private CachedLocaleCollectionProvider $cachedLocaleCollectionProvider;
@@ -44,13 +44,17 @@ final class CachedLocaleCollectionProviderTest extends TestCase
 
     public function testReturnsAllLocalesViaCache(): void
     {
-        /** @var LocaleInterface|MockObject $someLocaleMock */
+        /** @var LocaleInterface&MockObject $someLocaleMock */
         $someLocaleMock = $this->createMock(LocaleInterface::class);
-        /** @var LocaleInterface|MockObject $anotherLocaleMock */
+        /** @var LocaleInterface&MockObject $anotherLocaleMock */
         $anotherLocaleMock = $this->createMock(LocaleInterface::class);
         $someLocaleMock->expects($this->once())->method('getCode')->willReturn('en_US');
         $anotherLocaleMock->expects($this->once())->method('getCode')->willReturn('en_GB');
-        $this->cacheMock->expects($this->once())->method('get')->with('sylius_locales', $this->isType('callable'))->will(fn ($args) => $args[1]());
+        $this->cacheMock->expects($this->once())->method('get')
+            ->with('sylius_locales', $this->isType('callable'))
+            ->willReturnCallback(function (string $key, callable $callback) {
+                return $callback();
+            });
         $this->decoratedMock->expects($this->once())->method('getAll')->willReturn(['en_US' => $someLocaleMock, 'en_GB' => $anotherLocaleMock]);
         $this->assertSame(['en_US' => $someLocaleMock, 'en_GB' => $anotherLocaleMock], $this->cachedLocaleCollectionProvider->getAll());
     }

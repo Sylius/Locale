@@ -22,7 +22,7 @@ use Sylius\Resource\Doctrine\Persistence\RepositoryInterface;
 
 final class LocaleCollectionProviderTest extends TestCase
 {
-    /** @var RepositoryInterface|MockObject */
+    /** @var RepositoryInterface&MockObject */
     private MockObject $localeRepositoryMock;
 
     private LocaleCollectionProvider $localeCollectionProvider;
@@ -40,9 +40,9 @@ final class LocaleCollectionProviderTest extends TestCase
 
     public function testReturnsAllLocales(): void
     {
-        /** @var LocaleInterface|MockObject $someLocaleMock */
+        /** @var LocaleInterface&MockObject $someLocaleMock */
         $someLocaleMock = $this->createMock(LocaleInterface::class);
-        /** @var LocaleInterface|MockObject $anotherLocaleMock */
+        /** @var LocaleInterface&MockObject $anotherLocaleMock */
         $anotherLocaleMock = $this->createMock(LocaleInterface::class);
         $someLocaleMock->expects($this->once())->method('getCode')->willReturn('en_US');
         $anotherLocaleMock->expects($this->once())->method('getCode')->willReturn('en_GB');
