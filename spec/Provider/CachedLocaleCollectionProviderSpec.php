@@ -11,40 +11,48 @@
 
 declare(strict_types=1);
 
-namespace spec\Sylius\Component\Locale\Provider;
+namespace Tests\Sylius\Component\Locale\Provider;
 
-use PhpSpec\ObjectBehavior;
-use Prophecy\Argument;
+use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\MockObject\MockObject;
+use Sylius\Component\Locale\Provider\CachedLocaleCollectionProvider;
 use Sylius\Component\Locale\Model\LocaleInterface;
 use Sylius\Component\Locale\Provider\LocaleCollectionProviderInterface;
 use Symfony\Contracts\Cache\CacheInterface;
 
-final class CachedLocaleCollectionProviderSpec extends ObjectBehavior
+final class CachedLocaleCollectionProviderTest extends TestCase
 {
-    function let(LocaleCollectionProviderInterface $decorated, CacheInterface $cache): void
+    /**
+     * @var LocaleCollectionProviderInterface|MockObject
+     */
+    private MockObject $decoratedMock;
+    /**
+     * @var CacheInterface|MockObject
+     */
+    private MockObject $cacheMock;
+    private CachedLocaleCollectionProvider $cachedLocaleCollectionProvider;
+    protected function setUp(): void
     {
-        $this->beConstructedWith($decorated, $cache);
+        $this->decoratedMock = $this->createMock(LocaleCollectionProviderInterface::class);
+        $this->cacheMock = $this->createMock(CacheInterface::class);
+        $this->cachedLocaleCollectionProvider = new CachedLocaleCollectionProvider($this->decoratedMock, $this->cacheMock);
     }
 
-    function it_implements_locale_collection_provider_interface(): void
+    public function testImplementsLocaleCollectionProviderInterface(): void
     {
-        $this->shouldImplement(LocaleCollectionProviderInterface::class);
+        $this->assertInstanceOf(LocaleCollectionProviderInterface::class, $this->cachedLocaleCollectionProvider);
     }
 
-    function it_returns_all_locales_via_cache(
-        LocaleCollectionProviderInterface $decorated,
-        CacheInterface $cache,
-        LocaleInterface $someLocale,
-        LocaleInterface $anotherLocale,
-    ): void {
-        $someLocale->getCode()->willReturn('en_US');
-        $anotherLocale->getCode()->willReturn('en_GB');
-
-        $cache->get('sylius_locales', Argument::type('callable'))->will(function ($args) {
-            return $args[1]();
-        });
-        $decorated->getAll()->willReturn(['en_US' => $someLocale, 'en_GB' => $anotherLocale]);
-
-        $this->getAll()->shouldReturn(['en_US' => $someLocale, 'en_GB' => $anotherLocale]);
+    public function testReturnsAllLocalesViaCache(): void
+    {
+        /** @var LocaleInterface|MockObject $someLocaleMock */
+        $someLocaleMock = $this->createMock(LocaleInterface::class);
+        /** @var LocaleInterface|MockObject $anotherLocaleMock */
+        $anotherLocaleMock = $this->createMock(LocaleInterface::class);
+        $someLocaleMock->expects($this->once())->method('getCode')->willReturn('en_US');
+        $anotherLocaleMock->expects($this->once())->method('getCode')->willReturn('en_GB');
+        $this->cacheMock->expects($this->once())->method('get')->with('sylius_locales', $this->isType('callable'))->will(fn($args) => $args[1]());
+        $this->decoratedMock->expects($this->once())->method('getAll')->willReturn(['en_US' => $someLocaleMock, 'en_GB' => $anotherLocaleMock]);
+        $this->assertSame(['en_US' => $someLocaleMock, 'en_GB' => $anotherLocaleMock], $this->cachedLocaleCollectionProvider->getAll());
     }
 }

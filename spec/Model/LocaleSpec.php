@@ -11,72 +11,70 @@
 
 declare(strict_types=1);
 
-namespace spec\Sylius\Component\Locale\Model;
+namespace Tests\Sylius\Component\Locale\Model;
 
-use PhpSpec\ObjectBehavior;
+use PHPUnit\Framework\TestCase;
+use Locale;
 use Sylius\Component\Locale\Model\LocaleInterface;
 use Sylius\Resource\Model\TimestampableInterface;
 
-final class LocaleSpec extends ObjectBehavior
+final class LocaleTest extends TestCase
 {
-    function let(): void
+    private \Sylius\Component\Locale\Model\Locale $locale;
+    protected function setUp(): void
     {
-        \Locale::setDefault('en');
+        $this->locale = new \Sylius\Component\Locale\Model\Locale();
+        Locale::setDefault('en');
     }
 
-    function it_implements_a_locale_interface(): void
+    public function testImplementsALocaleInterface(): void
     {
-        $this->shouldImplement(LocaleInterface::class);
+        $this->assertInstanceOf(LocaleInterface::class, $this->locale);
     }
 
-    function it_is_timestampable(): void
+    public function testTimestampable(): void
     {
-        $this->shouldImplement(TimestampableInterface::class);
+        $this->assertInstanceOf(TimestampableInterface::class, $this->locale);
     }
 
-    function it_does_not_have_id_by_default(): void
+    public function testDoesNotHaveIdByDefault(): void
     {
-        $this->getId()->shouldReturn(null);
+        $this->assertNull($this->locale->getId());
     }
 
-    function it_has_no_code_by_default(): void
+    public function testHasNoCodeByDefault(): void
     {
-        $this->getCode()->shouldReturn(null);
+        $this->assertNull($this->locale->getCode());
     }
 
-    function its_code_is_mutable(): void
+    public function testItsCodeIsMutable(): void
     {
-        $this->setCode('de_DE');
-        $this->getCode()->shouldReturn('de_DE');
+        $this->locale->setCode('de_DE');
+        $this->assertSame('de_DE', $this->locale->getCode());
     }
 
-    function it_has_a_name(): void
+    public function testHasAName(): void
     {
-        $this->setCode('pl_PL');
-        $this->getName()->shouldReturn('Polish (Poland)');
-        $this->getName('es')->shouldReturn('polaco (Polonia)');
+        $this->locale->setCode('pl_PL');
+        $this->assertSame('Polish (Poland)', $this->locale->getName());
+        $this->assertSame('polaco (Polonia)', $this->locale->getName('es'));
 
-        $this->setCode('pl');
-        $this->getName()->shouldReturn('Polish');
-        $this->getName('es')->shouldReturn('polaco');
+        $this->locale->setCode('pl');
+        $this->assertSame('Polish', $this->locale->getName());
+        $this->assertSame('polaco', $this->locale->getName('es'));
     }
 
-    function it_returns_name_when_converted_to_string(): void
+    public function testReturnsNameWhenConvertedToString(): void
     {
-        $this->setCode('pl_PL');
-        $this->__toString()->shouldReturn('Polish (Poland)');
+        $this->locale->setCode('pl_PL');
+        $this->assertSame('Polish (Poland)', $this->locale->__toString());
 
-        $this->setCode('pl');
-        $this->__toString()->shouldReturn('Polish');
+        $this->locale->setCode('pl');
+        $this->assertSame('Polish', $this->locale->__toString());
     }
 
-    function it_initializes_creation_date_by_default(): void
+    public function testDoesNotHaveLastUpdateDateByDefault(): void
     {
-        $this->getCreatedAt()->shouldHaveType(\DateTimeInterface::class);
-    }
-
-    function it_does_not_have_last_update_date_by_default(): void
-    {
-        $this->getUpdatedAt()->shouldReturn(null);
+        $this->assertNull($this->locale->getUpdatedAt());
     }
 }

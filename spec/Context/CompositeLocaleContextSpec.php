@@ -11,63 +11,73 @@
 
 declare(strict_types=1);
 
-namespace spec\Sylius\Component\Locale\Context;
+namespace Tests\Sylius\Component\Locale\Context;
 
-use PhpSpec\ObjectBehavior;
+use PHPUnit\Framework\TestCase;
+use Sylius\Component\Locale\Context\CompositeLocaleContext;
+use PHPUnit\Framework\MockObject\MockObject;
 use Sylius\Component\Locale\Context\LocaleContextInterface;
 use Sylius\Component\Locale\Context\LocaleNotFoundException;
 
-final class CompositeLocaleContextSpec extends ObjectBehavior
+final class CompositeLocaleContextTest extends TestCase
 {
-    function it_implements_locale_context_interface(): void
+    private CompositeLocaleContext $compositeLocaleContext;
+    protected function setUp(): void
     {
-        $this->shouldImplement(LocaleContextInterface::class);
+        $this->compositeLocaleContext = new CompositeLocaleContext();
     }
-
-    function it_throws_a_locale_not_found_exception_if_there_are_no_nested_locale_contexts_defined(): void
+    public function testImplementsLocaleContextInterface(): void
     {
-        $this->shouldThrow(LocaleNotFoundException::class)->during('getLocaleCode');
+        $this->assertInstanceOf(LocaleContextInterface::class, $this->compositeLocaleContext);
     }
 
-    function it_throws_a_locale_not_found_exception_if_none_of_nested_locale_contexts_returned_a_locale(
-        LocaleContextInterface $localeContext,
-    ): void {
-        $localeContext->getLocaleCode()->willThrow(LocaleNotFoundException::class);
-
-        $this->addContext($localeContext);
-
-        $this->shouldThrow(LocaleNotFoundException::class)->during('getLocaleCode');
+    public function testThrowsALocaleNotFoundExceptionIfThereAreNoNestedLocaleContextsDefined(): void
+    {
+        $this->expectException(LocaleNotFoundException::class);
+        $this->compositeLocaleContext->getLocaleCode();
     }
 
-    function it_returns_first_result_returned_by_nested_request_resolvers(
-        LocaleContextInterface $firstLocaleContext,
-        LocaleContextInterface $secondLocaleContext,
-        LocaleContextInterface $thirdLocaleContext,
-    ): void {
-        $firstLocaleContext->getLocaleCode()->willThrow(LocaleNotFoundException::class);
-        $secondLocaleContext->getLocaleCode()->willReturn('en_US');
-        $thirdLocaleContext->getLocaleCode()->shouldNotBeCalled();
-
-        $this->addContext($firstLocaleContext);
-        $this->addContext($secondLocaleContext);
-        $this->addContext($thirdLocaleContext);
-
-        $this->getLocaleCode()->shouldReturn('en_US');
+    public function testThrowsALocaleNotFoundExceptionIfNoneOfNestedLocaleContextsReturnedALocale(): void
+    {
+        /** @var LocaleContextInterface|MockObject $localeContextMock */
+        $localeContextMock = $this->createMock(LocaleContextInterface::class);
+        $localeContextMock->expects($this->once())->method('getLocaleCode')->willThrowException(LocaleNotFoundException::class);
+        $this->compositeLocaleContext->addContext($localeContextMock);
+        $this->expectException(LocaleNotFoundException::class);
+        $this->compositeLocaleContext->getLocaleCode();
     }
 
-    function its_nested_request_resolvers_can_have_priority(
-        LocaleContextInterface $firstLocaleContext,
-        LocaleContextInterface $secondLocaleContext,
-        LocaleContextInterface $thirdLocaleContext,
-    ): void {
-        $firstLocaleContext->getLocaleCode()->shouldNotBeCalled();
-        $secondLocaleContext->getLocaleCode()->willReturn('pl_PL');
-        $thirdLocaleContext->getLocaleCode()->willThrow(LocaleNotFoundException::class);
+    public function testReturnsFirstResultReturnedByNestedRequestResolvers(): void
+    {
+        /** @var LocaleContextInterface|MockObject $firstLocaleContextMock */
+        $firstLocaleContextMock = $this->createMock(LocaleContextInterface::class);
+        /** @var LocaleContextInterface|MockObject $secondLocaleContextMock */
+        $secondLocaleContextMock = $this->createMock(LocaleContextInterface::class);
+        /** @var LocaleContextInterface|MockObject $thirdLocaleContextMock */
+        $thirdLocaleContextMock = $this->createMock(LocaleContextInterface::class);
+        $firstLocaleContextMock->expects($this->once())->method('getLocaleCode')->willThrowException(LocaleNotFoundException::class);
+        $secondLocaleContextMock->expects($this->once())->method('getLocaleCode')->willReturn('en_US');
+        $thirdLocaleContextMock->expects($this->never())->method('getLocaleCode');
+        $this->compositeLocaleContext->addContext($firstLocaleContextMock);
+        $this->compositeLocaleContext->addContext($secondLocaleContextMock);
+        $this->compositeLocaleContext->addContext($thirdLocaleContextMock);
+        $this->assertSame('en_US', $this->compositeLocaleContext->getLocaleCode());
+    }
 
-        $this->addContext($firstLocaleContext, -5);
-        $this->addContext($secondLocaleContext, 0);
-        $this->addContext($thirdLocaleContext, 5);
-
-        $this->getLocaleCode()->shouldReturn('pl_PL');
+    public function testItsNestedRequestResolversCanHavePriority(): void
+    {
+        /** @var LocaleContextInterface|MockObject $firstLocaleContextMock */
+        $firstLocaleContextMock = $this->createMock(LocaleContextInterface::class);
+        /** @var LocaleContextInterface|MockObject $secondLocaleContextMock */
+        $secondLocaleContextMock = $this->createMock(LocaleContextInterface::class);
+        /** @var LocaleContextInterface|MockObject $thirdLocaleContextMock */
+        $thirdLocaleContextMock = $this->createMock(LocaleContextInterface::class);
+        $firstLocaleContextMock->expects($this->never())->method('getLocaleCode');
+        $secondLocaleContextMock->expects($this->once())->method('getLocaleCode')->willReturn('pl_PL');
+        $thirdLocaleContextMock->expects($this->once())->method('getLocaleCode')->willThrowException(LocaleNotFoundException::class);
+        $this->compositeLocaleContext->addContext($firstLocaleContextMock, -5);
+        $this->compositeLocaleContext->addContext($secondLocaleContextMock, 0);
+        $this->compositeLocaleContext->addContext($thirdLocaleContextMock, 5);
+        $this->assertSame('pl_PL', $this->compositeLocaleContext->getLocaleCode());
     }
 }

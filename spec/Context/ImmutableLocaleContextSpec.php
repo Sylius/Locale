@@ -11,25 +11,27 @@
 
 declare(strict_types=1);
 
-namespace spec\Sylius\Component\Locale\Context;
+namespace Tests\Sylius\Component\Locale\Context;
 
-use PhpSpec\ObjectBehavior;
+use PHPUnit\Framework\TestCase;
+use Sylius\Component\Locale\Context\ImmutableLocaleContext;
 use Sylius\Component\Locale\Context\LocaleContextInterface;
 
-final class ImmutableLocaleContextSpec extends ObjectBehavior
+final class ImmutableLocaleContextTest extends TestCase
 {
-    function let(): void
+    private ImmutableLocaleContext $immutableLocaleContext;
+    protected function setUp(): void
     {
-        $this->beConstructedWith('pl_PL');
+        $this->immutableLocaleContext = new ImmutableLocaleContext('pl_PL');
     }
 
-    function it_is_a_locale_context(): void
+    public function testALocaleContext(): void
     {
-        $this->shouldImplement(LocaleContextInterface::class);
+        $this->assertInstanceOf(LocaleContextInterface::class, $this->immutableLocaleContext);
     }
 
-    function it_gets_a_locale_code(): void
+    public function testGetsALocaleCode(): void
     {
-        $this->getLocaleCode()->shouldReturn('pl_PL');
+        $this->assertSame('pl_PL', $this->immutableLocaleContext->getLocaleCode());
     }
 }

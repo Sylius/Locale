@@ -11,39 +11,48 @@
 
 declare(strict_types=1);
 
-namespace spec\Sylius\Component\Locale\Converter;
+namespace Tests\Sylius\Component\Locale\Converter;
 
-use PhpSpec\ObjectBehavior;
+use PHPUnit\Framework\TestCase;
+use Sylius\Component\Locale\Converter\LocaleConverter;
+use InvalidArgumentException;
 use Sylius\Component\Locale\Converter\LocaleConverterInterface;
 
-final class LocaleConverterSpec extends ObjectBehavior
+final class LocaleConverterTest extends TestCase
 {
-    function it_is_a_locale_converter(): void
+    private LocaleConverter $localeConverter;
+    protected function setUp(): void
     {
-        $this->shouldImplement(LocaleConverterInterface::class);
+        $this->localeConverter = new LocaleConverter();
+    }
+    public function testALocaleConverter(): void
+    {
+        $this->assertInstanceOf(LocaleConverterInterface::class, $this->localeConverter);
     }
 
-    function it_converts_locale_name_to_locale_code(): void
+    public function testConvertsLocaleNameToLocaleCode(): void
     {
-        $this->convertNameToCode('German')->shouldReturn('de');
-        $this->convertNameToCode('Norwegian')->shouldReturn('no');
-        $this->convertNameToCode('Polish')->shouldReturn('pl');
+        $this->assertSame('de', $this->localeConverter->convertNameToCode('German'));
+        $this->assertSame('no', $this->localeConverter->convertNameToCode('Norwegian'));
+        $this->assertSame('pl', $this->localeConverter->convertNameToCode('Polish'));
     }
 
-    function it_converts_locale_code_to_locale_name(): void
+    public function testConvertsLocaleCodeToLocaleName(): void
     {
-        $this->convertCodeToName('de')->shouldReturn('German');
-        $this->convertCodeToName('no')->shouldReturn('Norwegian');
-        $this->convertCodeToName('pl')->shouldReturn('Polish');
+        $this->assertSame('German', $this->localeConverter->convertCodeToName('de'));
+        $this->assertSame('Norwegian', $this->localeConverter->convertCodeToName('no'));
+        $this->assertSame('Polish', $this->localeConverter->convertCodeToName('pl'));
     }
 
-    function it_throws_invalid_argument_exception_if_cannot_convert_name_to_code(): void
+    public function testThrowsInvalidArgumentExceptionIfCannotConvertNameToCode(): void
     {
-        $this->shouldThrow(\InvalidArgumentException::class)->during('convertNameToCode', ['xyz']);
+        $this->expectException(InvalidArgumentException::class);
+        $this->localeConverter->convertNameToCode('xyz');
     }
 
-    function it_throws_invalid_argument_exception_if_cannot_convert_code_to_name(): void
+    public function testThrowsInvalidArgumentExceptionIfCannotConvertCodeToName(): void
     {
-        $this->shouldThrow(\InvalidArgumentException::class)->during('convertCodeToName', ['xyz']);
+        $this->expectException(InvalidArgumentException::class);
+        $this->localeConverter->convertCodeToName('xyz');
     }
 }

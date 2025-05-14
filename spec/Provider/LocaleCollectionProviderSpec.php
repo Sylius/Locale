@@ -11,35 +11,43 @@
 
 declare(strict_types=1);
 
-namespace spec\Sylius\Component\Locale\Provider;
+namespace Tests\Sylius\Component\Locale\Provider;
 
-use PhpSpec\ObjectBehavior;
+use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\MockObject\MockObject;
+use Sylius\Component\Locale\Provider\LocaleCollectionProvider;
 use Sylius\Component\Locale\Model\LocaleInterface;
 use Sylius\Component\Locale\Provider\LocaleCollectionProviderInterface;
 use Sylius\Resource\Doctrine\Persistence\RepositoryInterface;
 
-final class LocaleCollectionProviderSpec extends ObjectBehavior
+final class LocaleCollectionProviderTest extends TestCase
 {
+    /**
+     * @var RepositoryInterface|MockObject
+     */
+    private MockObject $localeRepositoryMock;
+    private LocaleCollectionProvider $localeCollectionProvider;
     /** @param RepositoryInterface<LocaleInterface> $localeRepository */
-    function let(RepositoryInterface $localeRepository): void
+    protected function setUp(): void
     {
-        $this->beConstructedWith($localeRepository);
+        $this->localeRepositoryMock = $this->createMock(RepositoryInterface::class);
+        $this->localeCollectionProvider = new LocaleCollectionProvider($this->localeRepositoryMock);
     }
 
-    function it_implements_locale_collection_provider_interface(): void
+    public function testImplementsLocaleCollectionProviderInterface(): void
     {
-        $this->shouldImplement(LocaleCollectionProviderInterface::class);
+        $this->assertInstanceOf(LocaleCollectionProviderInterface::class, $this->localeCollectionProvider);
     }
 
-    function it_returns_all_locales(
-        RepositoryInterface $localeRepository,
-        LocaleInterface $someLocale,
-        LocaleInterface $anotherLocale,
-    ): void {
-        $someLocale->getCode()->willReturn('en_US');
-        $anotherLocale->getCode()->willReturn('en_GB');
-        $localeRepository->findAll()->willReturn([$someLocale, $anotherLocale]);
-
-        $this->getAll()->shouldReturn(['en_US' => $someLocale, 'en_GB' => $anotherLocale]);
+    public function testReturnsAllLocales(): void
+    {
+        /** @var LocaleInterface|MockObject $someLocaleMock */
+        $someLocaleMock = $this->createMock(LocaleInterface::class);
+        /** @var LocaleInterface|MockObject $anotherLocaleMock */
+        $anotherLocaleMock = $this->createMock(LocaleInterface::class);
+        $someLocaleMock->expects($this->once())->method('getCode')->willReturn('en_US');
+        $anotherLocaleMock->expects($this->once())->method('getCode')->willReturn('en_GB');
+        $this->localeRepositoryMock->expects($this->once())->method('findAll')->willReturn([$someLocaleMock, $anotherLocaleMock]);
+        $this->assertSame(['en_US' => $someLocaleMock, 'en_GB' => $anotherLocaleMock], $this->localeCollectionProvider->getAll());
     }
 }
