@@ -13,18 +13,20 @@ declare(strict_types=1);
 
 namespace Tests\Sylius\Component\Locale\Converter;
 
+use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use Sylius\Component\Locale\Converter\LocaleConverter;
-use InvalidArgumentException;
 use Sylius\Component\Locale\Converter\LocaleConverterInterface;
 
 final class LocaleConverterTest extends TestCase
 {
     private LocaleConverter $localeConverter;
+
     protected function setUp(): void
     {
         $this->localeConverter = new LocaleConverter();
     }
+
     public function testALocaleConverter(): void
     {
         $this->assertInstanceOf(LocaleConverterInterface::class, $this->localeConverter);

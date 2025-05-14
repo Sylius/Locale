@@ -13,19 +13,21 @@ declare(strict_types=1);
 
 namespace Tests\Sylius\Component\Locale\Context;
 
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Sylius\Component\Locale\Context\CompositeLocaleContext;
-use PHPUnit\Framework\MockObject\MockObject;
 use Sylius\Component\Locale\Context\LocaleContextInterface;
 use Sylius\Component\Locale\Context\LocaleNotFoundException;
 
 final class CompositeLocaleContextTest extends TestCase
 {
     private CompositeLocaleContext $compositeLocaleContext;
+
     protected function setUp(): void
     {
         $this->compositeLocaleContext = new CompositeLocaleContext();
     }
+
     public function testImplementsLocaleContextInterface(): void
     {
         $this->assertInstanceOf(LocaleContextInterface::class, $this->compositeLocaleContext);

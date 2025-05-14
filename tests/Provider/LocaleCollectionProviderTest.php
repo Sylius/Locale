@@ -13,21 +13,20 @@ declare(strict_types=1);
 
 namespace Tests\Sylius\Component\Locale\Provider;
 
-use PHPUnit\Framework\TestCase;
 use PHPUnit\Framework\MockObject\MockObject;
-use Sylius\Component\Locale\Provider\LocaleCollectionProvider;
+use PHPUnit\Framework\TestCase;
 use Sylius\Component\Locale\Model\LocaleInterface;
+use Sylius\Component\Locale\Provider\LocaleCollectionProvider;
 use Sylius\Component\Locale\Provider\LocaleCollectionProviderInterface;
 use Sylius\Resource\Doctrine\Persistence\RepositoryInterface;
 
 final class LocaleCollectionProviderTest extends TestCase
 {
-    /**
-     * @var RepositoryInterface|MockObject
-     */
+    /** @var RepositoryInterface|MockObject */
     private MockObject $localeRepositoryMock;
+
     private LocaleCollectionProvider $localeCollectionProvider;
-    /** @param RepositoryInterface<LocaleInterface> $localeRepository */
+
     protected function setUp(): void
     {
         $this->localeRepositoryMock = $this->createMock(RepositoryInterface::class);

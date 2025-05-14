@@ -20,6 +20,7 @@ use Sylius\Component\Locale\Context\LocaleContextInterface;
 final class ImmutableLocaleContextTest extends TestCase
 {
     private ImmutableLocaleContext $immutableLocaleContext;
+
     protected function setUp(): void
     {
         $this->immutableLocaleContext = new ImmutableLocaleContext('pl_PL');

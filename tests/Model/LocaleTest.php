@@ -13,14 +13,15 @@ declare(strict_types=1);
 
 namespace Tests\Sylius\Component\Locale\Model;
 
-use PHPUnit\Framework\TestCase;
 use Locale;
+use PHPUnit\Framework\TestCase;
 use Sylius\Component\Locale\Model\LocaleInterface;
 use Sylius\Resource\Model\TimestampableInterface;
 
 final class LocaleTest extends TestCase
 {
     private \Sylius\Component\Locale\Model\Locale $locale;
+
     protected function setUp(): void
     {
         $this->locale = new \Sylius\Component\Locale\Model\Locale();

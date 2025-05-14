@@ -13,24 +13,23 @@ declare(strict_types=1);
 
 namespace Tests\Sylius\Component\Locale\Provider;
 
-use PHPUnit\Framework\TestCase;
 use PHPUnit\Framework\MockObject\MockObject;
-use Sylius\Component\Locale\Provider\CachedLocaleCollectionProvider;
+use PHPUnit\Framework\TestCase;
 use Sylius\Component\Locale\Model\LocaleInterface;
+use Sylius\Component\Locale\Provider\CachedLocaleCollectionProvider;
 use Sylius\Component\Locale\Provider\LocaleCollectionProviderInterface;
 use Symfony\Contracts\Cache\CacheInterface;
 
 final class CachedLocaleCollectionProviderTest extends TestCase
 {
-    /**
-     * @var LocaleCollectionProviderInterface|MockObject
-     */
+    /** @var LocaleCollectionProviderInterface|MockObject */
     private MockObject $decoratedMock;
-    /**
-     * @var CacheInterface|MockObject
-     */
+
+    /** @var CacheInterface|MockObject */
     private MockObject $cacheMock;
+
     private CachedLocaleCollectionProvider $cachedLocaleCollectionProvider;
+
     protected function setUp(): void
     {
         $this->decoratedMock = $this->createMock(LocaleCollectionProviderInterface::class);
@@ -51,7 +50,7 @@ final class CachedLocaleCollectionProviderTest extends TestCase
         $anotherLocaleMock = $this->createMock(LocaleInterface::class);
         $someLocaleMock->expects($this->once())->method('getCode')->willReturn('en_US');
         $anotherLocaleMock->expects($this->once())->method('getCode')->willReturn('en_GB');
-        $this->cacheMock->expects($this->once())->method('get')->with('sylius_locales', $this->isType('callable'))->will(fn($args) => $args[1]());
+        $this->cacheMock->expects($this->once())->method('get')->with('sylius_locales', $this->isType('callable'))->will(fn ($args) => $args[1]());
         $this->decoratedMock->expects($this->once())->method('getAll')->willReturn(['en_US' => $someLocaleMock, 'en_GB' => $anotherLocaleMock]);
         $this->assertSame(['en_US' => $someLocaleMock, 'en_GB' => $anotherLocaleMock], $this->cachedLocaleCollectionProvider->getAll());
     }
