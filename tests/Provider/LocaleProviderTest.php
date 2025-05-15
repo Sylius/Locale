@@ -29,26 +29,27 @@ final class LocaleProviderTest extends TestCase
 
     protected function setUp(): void
     {
+        parent::setUp();
         $this->localeCollectionProviderMock = $this->createMock(LocaleCollectionProviderInterface::class);
         $this->localeProvider = new LocaleProvider($this->localeCollectionProviderMock, 'pl_PL');
     }
 
     public function testALocaleProviderInterface(): void
     {
-        $this->assertInstanceOf(LocaleProviderInterface::class, $this->localeProvider);
+        self::assertInstanceOf(LocaleProviderInterface::class, $this->localeProvider);
     }
 
     public function testReturnsAllEnabledLocales(): void
     {
-        /** @var LocaleInterface&MockObject $localeMock */
-        $localeMock = $this->createMock(LocaleInterface::class);
-        $this->localeCollectionProviderMock->expects($this->once())->method('getAll')->willReturn([$localeMock]);
-        $localeMock->expects($this->once())->method('getCode')->willReturn('en_US');
-        $this->assertSame(['en_US'], $this->localeProvider->getAvailableLocalesCodes());
+        /** @var LocaleInterface&MockObject $locale */
+        $locale = $this->createMock(LocaleInterface::class);
+        $this->localeCollectionProviderMock->expects($this->once())->method('getAll')->willReturn([$locale]);
+        $locale->expects($this->once())->method('getCode')->willReturn('en_US');
+        self::assertSame(['en_US'], $this->localeProvider->getAvailableLocalesCodes());
     }
 
     public function testReturnsTheDefaultLocale(): void
     {
-        $this->assertSame('pl_PL', $this->localeProvider->getDefaultLocaleCode());
+        self::assertSame('pl_PL', $this->localeProvider->getDefaultLocaleCode());
     }
 }

@@ -13,69 +13,69 @@ declare(strict_types=1);
 
 namespace Tests\Sylius\Component\Locale\Model;
 
-use Locale;
 use PHPUnit\Framework\TestCase;
+use Sylius\Component\Locale\Model\Locale;
 use Sylius\Component\Locale\Model\LocaleInterface;
 use Sylius\Resource\Model\TimestampableInterface;
 
 final class LocaleTest extends TestCase
 {
-    private \Sylius\Component\Locale\Model\Locale $locale;
+    private Locale $locale;
 
     protected function setUp(): void
     {
-        $this->locale = new \Sylius\Component\Locale\Model\Locale();
-        Locale::setDefault('en');
+        parent::setUp();
+        $this->locale = new Locale();
     }
 
     public function testImplementsALocaleInterface(): void
     {
-        $this->assertInstanceOf(LocaleInterface::class, $this->locale);
+        self::assertInstanceOf(LocaleInterface::class, $this->locale);
     }
 
     public function testTimestampable(): void
     {
-        $this->assertInstanceOf(TimestampableInterface::class, $this->locale);
+        self::assertInstanceOf(TimestampableInterface::class, $this->locale);
     }
 
     public function testDoesNotHaveIdByDefault(): void
     {
-        $this->assertNull($this->locale->getId());
+        self::assertNull($this->locale->getId());
     }
 
     public function testHasNoCodeByDefault(): void
     {
-        $this->assertNull($this->locale->getCode());
+        self::assertNull($this->locale->getCode());
     }
 
     public function testItsCodeIsMutable(): void
     {
         $this->locale->setCode('de_DE');
-        $this->assertSame('de_DE', $this->locale->getCode());
+        self::assertSame('de_DE', $this->locale->getCode());
     }
 
     public function testHasAName(): void
     {
         $this->locale->setCode('pl_PL');
-        $this->assertSame('Polish (Poland)', $this->locale->getName());
-        $this->assertSame('polaco (Polonia)', $this->locale->getName('es'));
+        self::assertSame('Polish (Poland)', $this->locale->getName());
+        self::assertSame('polaco (Polonia)', $this->locale->getName('es'));
 
         $this->locale->setCode('pl');
-        $this->assertSame('Polish', $this->locale->getName());
-        $this->assertSame('polaco', $this->locale->getName('es'));
+        self::assertSame('Polish', $this->locale->getName());
+        self::assertSame('polaco', $this->locale->getName('es'));
     }
 
     public function testReturnsNameWhenConvertedToString(): void
     {
         $this->locale->setCode('pl_PL');
-        $this->assertSame('Polish (Poland)', $this->locale->__toString());
+        self::assertSame('Polish (Poland)', $this->locale->__toString());
 
         $this->locale->setCode('pl');
-        $this->assertSame('Polish', $this->locale->__toString());
+        self::assertSame('Polish', $this->locale->__toString());
     }
 
     public function testDoesNotHaveLastUpdateDateByDefault(): void
     {
-        $this->assertNull($this->locale->getUpdatedAt());
+        self::assertNull($this->locale->getUpdatedAt());
     }
 }

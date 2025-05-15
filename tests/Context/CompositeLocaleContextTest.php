@@ -23,63 +23,65 @@ final class CompositeLocaleContextTest extends TestCase
 {
     private CompositeLocaleContext $compositeLocaleContext;
 
+    /** @var LocaleContextInterface&MockObject */
+    private LocaleContextInterface $firstLocaleContext;
+
+    /** @var LocaleContextInterface&MockObject */
+    private LocaleContextInterface $secondLocaleContext;
+
+    /** @var LocaleContextInterface&MockObject */
+    private LocaleContextInterface $thirdLocaleContext;
+
     protected function setUp(): void
     {
+        parent::setUp();
         $this->compositeLocaleContext = new CompositeLocaleContext();
+        $this->firstLocaleContext = $this->createMock(LocaleContextInterface::class);
+        $this->secondLocaleContext = $this->createMock(LocaleContextInterface::class);
+        $this->thirdLocaleContext = $this->createMock(LocaleContextInterface::class);
     }
 
     public function testImplementsLocaleContextInterface(): void
     {
-        $this->assertInstanceOf(LocaleContextInterface::class, $this->compositeLocaleContext);
+        self::assertInstanceOf(LocaleContextInterface::class, $this->compositeLocaleContext);
     }
 
     public function testThrowsALocaleNotFoundExceptionIfThereAreNoNestedLocaleContextsDefined(): void
     {
-        $this->expectException(LocaleNotFoundException::class);
+        self::expectException(LocaleNotFoundException::class);
         $this->compositeLocaleContext->getLocaleCode();
     }
 
     public function testThrowsALocaleNotFoundExceptionIfNoneOfNestedLocaleContextsReturnedALocale(): void
     {
-        /** @var LocaleContextInterface&MockObject $localeContextMock */
-        $localeContextMock = $this->createMock(LocaleContextInterface::class);
-        $localeContextMock->expects($this->once())->method('getLocaleCode')->willThrowException(new LocaleNotFoundException());
-        $this->compositeLocaleContext->addContext($localeContextMock);
-        $this->expectException(LocaleNotFoundException::class);
+        $this->firstLocaleContext
+            ->expects($this->once())
+            ->method('getLocaleCode')
+            ->willThrowException(new LocaleNotFoundException());
+        $this->compositeLocaleContext->addContext($this->firstLocaleContext);
+        self::expectException(LocaleNotFoundException::class);
         $this->compositeLocaleContext->getLocaleCode();
     }
 
     public function testReturnsFirstResultReturnedByNestedRequestResolvers(): void
     {
-        /** @var LocaleContextInterface&MockObject $firstLocaleContextMock */
-        $firstLocaleContextMock = $this->createMock(LocaleContextInterface::class);
-        /** @var LocaleContextInterface&MockObject $secondLocaleContextMock */
-        $secondLocaleContextMock = $this->createMock(LocaleContextInterface::class);
-        /** @var LocaleContextInterface&MockObject $thirdLocaleContextMock */
-        $thirdLocaleContextMock = $this->createMock(LocaleContextInterface::class);
-        $firstLocaleContextMock->expects($this->once())->method('getLocaleCode')->willThrowException(new LocaleNotFoundException());
-        $secondLocaleContextMock->expects($this->once())->method('getLocaleCode')->willReturn('en_US');
-        $thirdLocaleContextMock->expects($this->never())->method('getLocaleCode');
-        $this->compositeLocaleContext->addContext($firstLocaleContextMock);
-        $this->compositeLocaleContext->addContext($secondLocaleContextMock);
-        $this->compositeLocaleContext->addContext($thirdLocaleContextMock);
-        $this->assertSame('en_US', $this->compositeLocaleContext->getLocaleCode());
+        $this->firstLocaleContext->expects($this->once())->method('getLocaleCode')->willThrowException(new LocaleNotFoundException());
+        $this->secondLocaleContext->expects($this->once())->method('getLocaleCode')->willReturn('en_US');
+        $this->thirdLocaleContext->expects($this->never())->method('getLocaleCode');
+        $this->compositeLocaleContext->addContext($this->firstLocaleContext);
+        $this->compositeLocaleContext->addContext($this->secondLocaleContext);
+        $this->compositeLocaleContext->addContext($this->thirdLocaleContext);
+        self::assertSame('en_US', $this->compositeLocaleContext->getLocaleCode());
     }
 
     public function testItsNestedRequestResolversCanHavePriority(): void
     {
-        /** @var LocaleContextInterface&MockObject $firstLocaleContextMock */
-        $firstLocaleContextMock = $this->createMock(LocaleContextInterface::class);
-        /** @var LocaleContextInterface&MockObject $secondLocaleContextMock */
-        $secondLocaleContextMock = $this->createMock(LocaleContextInterface::class);
-        /** @var LocaleContextInterface&MockObject $thirdLocaleContextMock */
-        $thirdLocaleContextMock = $this->createMock(LocaleContextInterface::class);
-        $firstLocaleContextMock->expects($this->never())->method('getLocaleCode');
-        $secondLocaleContextMock->expects($this->once())->method('getLocaleCode')->willReturn('pl_PL');
-        $thirdLocaleContextMock->expects($this->once())->method('getLocaleCode')->willThrowException(new LocaleNotFoundException());
-        $this->compositeLocaleContext->addContext($firstLocaleContextMock, -5);
-        $this->compositeLocaleContext->addContext($secondLocaleContextMock, 0);
-        $this->compositeLocaleContext->addContext($thirdLocaleContextMock, 5);
-        $this->assertSame('pl_PL', $this->compositeLocaleContext->getLocaleCode());
+        $this->firstLocaleContext->expects($this->never())->method('getLocaleCode');
+        $this->secondLocaleContext->expects($this->once())->method('getLocaleCode')->willReturn('pl_PL');
+        $this->thirdLocaleContext->expects($this->once())->method('getLocaleCode')->willThrowException(new LocaleNotFoundException());
+        $this->compositeLocaleContext->addContext($this->firstLocaleContext, -5);
+        $this->compositeLocaleContext->addContext($this->secondLocaleContext, 0);
+        $this->compositeLocaleContext->addContext($this->thirdLocaleContext, 5);
+        self::assertSame('pl_PL', $this->compositeLocaleContext->getLocaleCode());
     }
 }

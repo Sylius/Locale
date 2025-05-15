@@ -23,30 +23,31 @@ use Sylius\Resource\Doctrine\Persistence\RepositoryInterface;
 final class LocaleCollectionProviderTest extends TestCase
 {
     /** @var RepositoryInterface&MockObject */
-    private MockObject $localeRepositoryMock;
+    private MockObject $localeRepository;
 
     private LocaleCollectionProvider $localeCollectionProvider;
 
     protected function setUp(): void
     {
-        $this->localeRepositoryMock = $this->createMock(RepositoryInterface::class);
-        $this->localeCollectionProvider = new LocaleCollectionProvider($this->localeRepositoryMock);
+        parent::setUp();
+        $this->localeRepository = $this->createMock(RepositoryInterface::class);
+        $this->localeCollectionProvider = new LocaleCollectionProvider($this->localeRepository);
     }
 
     public function testImplementsLocaleCollectionProviderInterface(): void
     {
-        $this->assertInstanceOf(LocaleCollectionProviderInterface::class, $this->localeCollectionProvider);
+        self::assertInstanceOf(LocaleCollectionProviderInterface::class, $this->localeCollectionProvider);
     }
 
     public function testReturnsAllLocales(): void
     {
-        /** @var LocaleInterface&MockObject $someLocaleMock */
-        $someLocaleMock = $this->createMock(LocaleInterface::class);
-        /** @var LocaleInterface&MockObject $anotherLocaleMock */
-        $anotherLocaleMock = $this->createMock(LocaleInterface::class);
-        $someLocaleMock->expects($this->once())->method('getCode')->willReturn('en_US');
-        $anotherLocaleMock->expects($this->once())->method('getCode')->willReturn('en_GB');
-        $this->localeRepositoryMock->expects($this->once())->method('findAll')->willReturn([$someLocaleMock, $anotherLocaleMock]);
-        $this->assertSame(['en_US' => $someLocaleMock, 'en_GB' => $anotherLocaleMock], $this->localeCollectionProvider->getAll());
+        /** @var LocaleInterface&MockObject $someLocale */
+        $someLocale = $this->createMock(LocaleInterface::class);
+        /** @var LocaleInterface&MockObject $anotherLocale */
+        $anotherLocale = $this->createMock(LocaleInterface::class);
+        $someLocale->expects($this->once())->method('getCode')->willReturn('en_US');
+        $anotherLocale->expects($this->once())->method('getCode')->willReturn('en_GB');
+        $this->localeRepository->expects($this->once())->method('findAll')->willReturn([$someLocale, $anotherLocale]);
+        self::assertSame(['en_US' => $someLocale, 'en_GB' => $anotherLocale], $this->localeCollectionProvider->getAll());
     }
 }

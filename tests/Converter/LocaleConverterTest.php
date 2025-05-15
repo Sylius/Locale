@@ -24,37 +24,38 @@ final class LocaleConverterTest extends TestCase
 
     protected function setUp(): void
     {
+        parent::setUp();
         $this->localeConverter = new LocaleConverter();
     }
 
     public function testALocaleConverter(): void
     {
-        $this->assertInstanceOf(LocaleConverterInterface::class, $this->localeConverter);
+        self::assertInstanceOf(LocaleConverterInterface::class, $this->localeConverter);
     }
 
     public function testConvertsLocaleNameToLocaleCode(): void
     {
-        $this->assertSame('de', $this->localeConverter->convertNameToCode('German'));
-        $this->assertSame('no', $this->localeConverter->convertNameToCode('Norwegian'));
-        $this->assertSame('pl', $this->localeConverter->convertNameToCode('Polish'));
+        self::assertSame('de', $this->localeConverter->convertNameToCode('German'));
+        self::assertSame('no', $this->localeConverter->convertNameToCode('Norwegian'));
+        self::assertSame('pl', $this->localeConverter->convertNameToCode('Polish'));
     }
 
     public function testConvertsLocaleCodeToLocaleName(): void
     {
-        $this->assertSame('German', $this->localeConverter->convertCodeToName('de'));
-        $this->assertSame('Norwegian', $this->localeConverter->convertCodeToName('no'));
-        $this->assertSame('Polish', $this->localeConverter->convertCodeToName('pl'));
+        self::assertSame('German', $this->localeConverter->convertCodeToName('de'));
+        self::assertSame('Norwegian', $this->localeConverter->convertCodeToName('no'));
+        self::assertSame('Polish', $this->localeConverter->convertCodeToName('pl'));
     }
 
     public function testThrowsInvalidArgumentExceptionIfCannotConvertNameToCode(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        self::expectException(InvalidArgumentException::class);
         $this->localeConverter->convertNameToCode('xyz');
     }
 
     public function testThrowsInvalidArgumentExceptionIfCannotConvertCodeToName(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        self::expectException(InvalidArgumentException::class);
         $this->localeConverter->convertCodeToName('xyz');
     }
 }

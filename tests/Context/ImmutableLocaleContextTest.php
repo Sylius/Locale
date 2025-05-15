@@ -23,16 +23,17 @@ final class ImmutableLocaleContextTest extends TestCase
 
     protected function setUp(): void
     {
+        parent::setUp();
         $this->immutableLocaleContext = new ImmutableLocaleContext('pl_PL');
     }
 
     public function testALocaleContext(): void
     {
-        $this->assertInstanceOf(LocaleContextInterface::class, $this->immutableLocaleContext);
+        self::assertInstanceOf(LocaleContextInterface::class, $this->immutableLocaleContext);
     }
 
     public function testGetsALocaleCode(): void
     {
-        $this->assertSame('pl_PL', $this->immutableLocaleContext->getLocaleCode());
+        self::assertSame('pl_PL', $this->immutableLocaleContext->getLocaleCode());
     }
 }

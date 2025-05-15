@@ -23,39 +23,41 @@ use Symfony\Contracts\Cache\CacheInterface;
 final class CachedLocaleCollectionProviderTest extends TestCase
 {
     /** @var LocaleCollectionProviderInterface&MockObject */
-    private MockObject $decoratedMock;
+    private MockObject $decorated;
 
     /** @var CacheInterface&MockObject */
-    private MockObject $cacheMock;
+    private MockObject $cache;
 
     private CachedLocaleCollectionProvider $cachedLocaleCollectionProvider;
 
     protected function setUp(): void
     {
-        $this->decoratedMock = $this->createMock(LocaleCollectionProviderInterface::class);
-        $this->cacheMock = $this->createMock(CacheInterface::class);
-        $this->cachedLocaleCollectionProvider = new CachedLocaleCollectionProvider($this->decoratedMock, $this->cacheMock);
+        parent::setUp();
+        $this->decorated = $this->createMock(LocaleCollectionProviderInterface::class);
+        $this->cache = $this->createMock(CacheInterface::class);
+        $this->cachedLocaleCollectionProvider = new CachedLocaleCollectionProvider($this->decorated, $this->cache);
     }
 
     public function testImplementsLocaleCollectionProviderInterface(): void
     {
-        $this->assertInstanceOf(LocaleCollectionProviderInterface::class, $this->cachedLocaleCollectionProvider);
+        self::assertInstanceOf(LocaleCollectionProviderInterface::class, $this->cachedLocaleCollectionProvider);
     }
 
     public function testReturnsAllLocalesViaCache(): void
     {
-        /** @var LocaleInterface&MockObject $someLocaleMock */
-        $someLocaleMock = $this->createMock(LocaleInterface::class);
-        /** @var LocaleInterface&MockObject $anotherLocaleMock */
-        $anotherLocaleMock = $this->createMock(LocaleInterface::class);
-        $someLocaleMock->expects($this->once())->method('getCode')->willReturn('en_US');
-        $anotherLocaleMock->expects($this->once())->method('getCode')->willReturn('en_GB');
-        $this->cacheMock->expects($this->once())->method('get')
+        /** @var LocaleInterface&MockObject $someLocale */
+        $someLocale = $this->createMock(LocaleInterface::class);
+        /** @var LocaleInterface&MockObject $anotherLocale */
+        $anotherLocale = $this->createMock(LocaleInterface::class);
+        $someLocale->method('getCode')->willReturn('en_US');
+        $anotherLocale->method('getCode')->willReturn('en_GB');
+        $this->cache->expects($this->once())->method('get')
             ->with('sylius_locales', $this->isType('callable'))
             ->willReturnCallback(function (string $key, callable $callback) {
                 return $callback();
             });
-        $this->decoratedMock->expects($this->once())->method('getAll')->willReturn(['en_US' => $someLocaleMock, 'en_GB' => $anotherLocaleMock]);
-        $this->assertSame(['en_US' => $someLocaleMock, 'en_GB' => $anotherLocaleMock], $this->cachedLocaleCollectionProvider->getAll());
+        $this->decorated->expects($this->once())->method('getAll')
+            ->willReturn(['en_US' => $someLocale, 'en_GB' => $anotherLocale]);
+        self::assertSame(['en_US' => $someLocale, 'en_GB' => $anotherLocale], $this->cachedLocaleCollectionProvider->getAll());
     }
 }

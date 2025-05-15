@@ -23,33 +23,33 @@ use Sylius\Component\Locale\Provider\LocaleProviderInterface;
 final class ProviderBasedLocaleContextTest extends TestCase
 {
     /** @var LocaleProviderInterface&MockObject */
-    private MockObject $localeProviderMock;
+    private MockObject $localeProvider;
 
     private ProviderBasedLocaleContext $providerBasedLocaleContext;
 
     protected function setUp(): void
     {
-        $this->localeProviderMock = $this->createMock(LocaleProviderInterface::class);
-        $this->providerBasedLocaleContext = new ProviderBasedLocaleContext($this->localeProviderMock);
+        $this->localeProvider = $this->createMock(LocaleProviderInterface::class);
+        $this->providerBasedLocaleContext = new ProviderBasedLocaleContext($this->localeProvider);
     }
 
     public function testALocaleContext(): void
     {
-        $this->assertInstanceOf(LocaleContextInterface::class, $this->providerBasedLocaleContext);
+        self::assertInstanceOf(LocaleContextInterface::class, $this->providerBasedLocaleContext);
     }
 
     public function testReturnsTheChannelsDefaultLocale(): void
     {
-        $this->localeProviderMock->expects($this->once())->method('getAvailableLocalesCodes')->willReturn(['pl_PL', 'en_US']);
-        $this->localeProviderMock->expects($this->once())->method('getDefaultLocaleCode')->willReturn('pl_PL');
-        $this->assertSame('pl_PL', $this->providerBasedLocaleContext->getLocaleCode());
+        $this->localeProvider->expects($this->once())->method('getAvailableLocalesCodes')->willReturn(['pl_PL', 'en_US']);
+        $this->localeProvider->expects($this->once())->method('getDefaultLocaleCode')->willReturn('pl_PL');
+        self::assertSame('pl_PL', $this->providerBasedLocaleContext->getLocaleCode());
     }
 
     public function testThrowsALocaleNotFoundExceptionIfDefaultLocaleIsNotAvailable(): void
     {
-        $this->localeProviderMock->expects($this->once())->method('getAvailableLocalesCodes')->willReturn(['es_ES', 'en_US']);
-        $this->localeProviderMock->expects($this->once())->method('getDefaultLocaleCode')->willReturn('pl_PL');
-        $this->expectException(LocaleNotFoundException::class);
+        $this->localeProvider->expects($this->once())->method('getAvailableLocalesCodes')->willReturn(['es_ES', 'en_US']);
+        $this->localeProvider->expects($this->once())->method('getDefaultLocaleCode')->willReturn('pl_PL');
+        self::expectException(LocaleNotFoundException::class);
         $this->providerBasedLocaleContext->getLocaleCode();
     }
 }
